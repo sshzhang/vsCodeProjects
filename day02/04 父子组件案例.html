@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+</head>
+
+
+<style>
+    .supStyle {
+        position: absolute;
+        right: 50px;
+    }
+
+    .dataShow {
+        background-color: blueviolet;
+        border: 1px dashed;
+        color: azure;
+    }
+
+    .inlineDataShow {
+
+        padding: 10px 20px;
+    }
+</style>
+
+<body>
+    <div id="app">
+        <template1 @func="addComment">
+        </template1>
+        <div class="dataShow" v-for="item in lists" :key="item.id">
+            <div class="inlineDataShow">
+                <span>{{item.content}}</span>
+                <sup class="supStyle">{{item.userName}}</sup>
+            </div>
+        </div>
+    </div>
+
+    <template id="temp1">
+
+        <div>
+            <label>内容content</label>
+            <div style="margin-left: 10px;">
+                <textarea v-model="content"></textarea>
+            </div>
+            <label>作者userName</label>
+            <div style="margin-left: 10px;">
+                <input type="text" v-model="userName" />
+            </div>
+            <input type="button" value="提交评论" style="margin-left: 10px;margin-top: 5px;" @click="saveTheComment" />
+        </div>
+    </template>
+    <script>
+        var templeateObject = {
+            template: '#temp1',
+            data() {
+                return {
+                    content: '',
+                    userName: ''
+                };
+            },
+            methods: {
+                saveTheComment() {
+                    this.$emit('func', {
+                        content: this.content,
+                        userName: this.userName
+                    });
+                    this.content=this.userName=''
+                    console.log('success!')
+                }
+            }
+        }
+
+        var vu = new Vue({
+            el: '#app',
+            data: {
+                // lists: [{ content: '我觉得特朗普经济思想还是可以的', userName: '一个不知名的路人' },
+                // { content: '为啥大家都在说特朗普是川建国', userName: '经济达人' },
+                // { content: '宇宙学大师，明日之子，宇宙超级流氓', userName: '川普经济学' }],
+                lists: []
+
+            },
+            methods: {
+                addComment(newCommentObject) {
+                    // 只能保存字符串
+                    var tempt = JSON.parse(localStorage.getItem('com1') || '[]');
+                    tempt.push(newCommentObject);
+                    localStorage.setItem('com1', JSON.stringify(tempt))
+                    this.lists = tempt
+                    console.log("addComment success!")
+                }
+            },
+
+            components: {
+                template1: templeateObject
+            },
+            // 生命周期函数
+            created() {
+                this.lists = JSON.parse(localStorage.getItem('com1') || '[]');
+            }
+        })
+    </script>
+</body>
+
+</html>

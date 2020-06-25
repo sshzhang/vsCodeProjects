@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+</head>
+
+<body>
+
+    <!-- 
+        watch computed, methods的对比
+        watch: 监听相应属性值改变之后调用相应方法
+         computed 定义计算属性， 只要计算属性相关的值改变，就调用相应的方法. 方法调用的时候还是想属性引用一样 且方法必须返回一个值
+         methods: 业务逻辑方法
+
+        依据上述三种方法实现一个fistname和lastname自动合成name的功能
+        
+
+        computed和watch 的区别  
+           
+             1. computed必须要return 一个返回值， 且computed定义的计算属性不能再data中出现。
+             
+             2. watch监听某个数据是否改变，而computed监听所有能够使定义属性值改变的事件
+
+             
+       -->
+
+    <div id="app">
+        <!-- <label>firstName</label>
+        <input type="tex" v-model="firstName" @keyup="getFullName" />
+        <label>lastName</label>
+        <input type="tex" v-model="lastName" @keyup="getFullName" />
+        <label>Name</label>
+        <input type="tex"  v-model="fullName" /> -->
+
+        <label>firstName</label>
+        <input type="tex" v-model="firstName"/>
+        <label>lastName</label>
+        <input type="tex" v-model="lastName"/>
+        <label>Name</label>
+        <input type="tex" v-model="fullName"/>
+        <span>{{fullName}}</span>        
+        <span>{{fullName}}</span>        
+        <span>{{fullName}}</span>        
+    
+    </div>
+
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+
+                firstName:'',
+                lastName:'',
+                fullName:''// 定义计算属性的时候此数据需要删除
+            },
+            methods: {
+
+                getFullName() {
+                    this.fullName = this.firstName + "---" + this.lastName;
+                }
+            },
+
+            watch:{
+                //  watch 会监听相应变量数据的改变, 一旦改变调用相应的函数
+                firstName:function(newValue, oldValue){ //newValue, oldValue 分别表示更新之后的值和更新之前的值
+                    console.log("newValue:"+newValue, "oldValue:"+oldValue);
+                    
+                    this.fullName=this.firstName+"---"+this.lastName;
+                },
+                "lastName":function(newValue, oldValue){
+                    console.log("newValue:"+newValue, "oldValue:"+oldValue);
+                    this.fullName=this.firstName+"---"+this.lastName;
+                }
+            }
+
+
+            // computed:{  // 1.  利用computed定义计算属性， 第一次调用会把数据缓存到内存中，如果数据没有改变下次调用的时候直接从内存中取
+            //             // 2. 必须return 一个计算之后的值返回
+            //     fullName:function(){
+            //         console.log('0k')
+            //         return this.firstName+"----"+this.lastName;
+            //     }
+                
+            // }
+        });
+    </script>
+</body>
+
+</html>

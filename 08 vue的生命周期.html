@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+<body>
+    <!-- vue的生命周期问题
+    
+    创建之前的生命周期函数:   
+                实例对象创建过程
+                           beforeCreate  创建对象实力之前，无法访问data和methods中数据
+                           
+                           created  数据注入之后，可以访问data及methods
+                相关内容区域的挂载过程            
+                           
+                           beforeMount   对应相关区域模板只加载到内存dom树中，还未渲染到页面中的dom中
+                           
+                           mounted        页面渲染挂在到dom树中
+
+    运行过程中的生命周期函数: 
+                     
+                    beforeUpdate  数据data发生改变的时候调用，但是此刻改变的数据还没有重新渲染到dom页面中。
+                     
+                     updated  把改变的数据重新渲染页面之后调用此方法。
+
+    效果过程中的生命周期函数: 
+                     
+                    beforeDestory  实例调用方法$destory() 销毁时调用此方法  
+                     
+                     destoryed 实例销毁之后调用此方法
+
+    -->
+    <div id="sm">
+        <p id="pId">{{msg}}</p>
+
+        <input type="button" @click="msg='ssm'" value="改变msg的值"/>
+    </div>
+
+    <script>
+        var vu = new Vue(
+            {
+                el: '#sm',
+                data: {
+
+                    msg:'生命周期msg'
+                },
+                methods: {
+                    sayHello(){
+                        return 'sayHello';
+                    }
+                },
+                
+                // beforeCreate 初始化实例之前调用的生命周期方法，此刻实例中的data和methods数据都未设置
+                beforeCreate:function(){
+                    // this.msg未设置显示undefined, this.sayHello()报错，不存在这个方法
+                    //console.log(`beforeCrated 调用 ${this.msg}, ${this.sayHello()}`);
+                },
+                // created vue对象实例化完成之后调用的方法, 此方发能够访问到data和methods中的属性
+                created:function(){
+
+                    console.log(`created 调用${this.msg}, ${this.sayHello()}`);
+                    
+                },
+                // 区域渲染之前，此刻状态下对应区域的模板渲染还保存在内存dom树中，没有显示到真正的页面中 
+                beforeMount:function(){
+                   console.log("beforeMount:  "+document.getElementById('pId').innerText);
+                },
+                // 模板渲染到页面之后，其实就是那些vue指令和数据已经渲染到页面中之后调用的生命周期方法，
+                // 因此，可以访问到dom中的元素信息
+                mounted:function(){
+                    console.log("mounted:  "+document.getElementById('pId').innerText);
+                },
+
+                // 运行期间的生命周期函数， 此函数在data被修改的时候调用,因此能够获取当前元素改变之后的值
+                // 但是此状态下dom元素并未重新更新，因此获取dom元素还是原来的值
+                beforeUpdate:function(){
+                    console.log("beforeUpdate: "+this.msg+"  dom中的信息未更新: "+document.getElementById('pId').innerText);
+                    
+                },
+                // 更新之后的，重新渲染dom并应用更新数据。此状态下新数据已经写入到dom中 
+                updated:function(){
+                    console.log("update: "+this.msg+"  dom中的信息更新为: "+document.getElementById('pId').innerText);
+                },
+                // 销毁过程中的生命周期函数
+
+                // 当vue实例调用$destory()函数时，会调用此生命周期函数
+                beforeDestroy:function(){
+                    console.log('beforeDestroy方法')
+                },
+                destroyed:function(){
+                    console.log('destoryed方法');
+                }
+            }
+        )
+    </script>
+</body>
+
+</html>

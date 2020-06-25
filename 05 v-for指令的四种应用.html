@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+<body>
+<!--测试v-for在四种数据的应用
+   简单数组
+   对象数组
+   对象
+   数字
+-->
+    
+<div id="sVue">
+
+
+    
+    <!--简单数组-->
+    <p v-for="item in sArray">{{item}}</p>
+    
+    <!--复杂对象数组-->
+    <p v-for="item in cArray">id:  {{item.id}} 姓名:   {{item.name}}</p>
+    <!--对象-->
+    <p v-for="(value, key) in obj"> {{value}}   {{key}}</p>
+    <!--数字 从1开始迭代-->
+    <p v-for="s in count">{{s}}</p>
+   
+   
+    <!-- v-for迭代时候key属性的作用及为什么key只能为数字和字符串理由如下-->
+   <div> 
+    <label>id<input type="text" v-model="id"/></label>
+    <label>name<input type="text" v-model="name"/></label>
+    <input type="button" @click="caclu" value="添加"/>
+    </div> 
+    <!--需要设置key来定位相应数据准确位置且key只能为Number或String-->
+        <p v-for="item in cArray" :key="item.id"><input type="checkbox"/>:  {{item.id}} 姓名:   {{item.name}}</p>
+</div>
+
+<script>
+
+    var vue=new Vue({
+
+        el:'#sVue',
+        data:{
+
+            sArray:[1,2,3,4], // 简单数组
+            // 对象数组
+            cArray:[{id:'1', name:'张飞'},{id:'2', name:'关羽'}, {id:'3', name:'赵云'}, {id:'4',name:'马超'},{id:'5',name:'黄忠'}],
+
+            obj:{id:'1000', name:'张秀杰', age:'27', gender:'male'},
+            count:10,
+            id:undefined,
+            name:undefined,
+        },
+        methods:{
+
+            caclu(){
+                this.cArray.unshift({id:this.id,name:this.name});
+            }
+        }
+    })
+</script>
+
+</body>
+</html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+    <style>
+        .componenttransition-enter,
+        .componenttransition-leave-to {
+            opacity: 0;
+            transform: translateX(50px);
+        }
+        .componenttransition-enter-active,
+        .componenttransition-leave-active {
+            transition: all 0.8s ease;
+        }
+
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 组件之间的切换 利用v-if 只能实现两个组件的切换，如果需要实现多个组件的切换需要利用Component标签 -->
+        <!-- <a @click.prevent="flage=true">登录</a>
+        <a @click.prevent="flage=false">注册</a>
+        <login-info v-if="flage"></login-info>
+        <register-info v-else="flage"></register-info> -->
+
+        <!-- Component标签就是一个组件的占位符, 利用is属性我们可以设置任意组件 -->
+        <a @click.prevent="componentName='login-info'">登录</a>
+        <a @click.prevent="componentName='register-info'">注册</a>
+
+        <!-- 利用动画 -->
+        <transition name="componenttransition" mode="out-in">
+            <Component :is="componentName"></Component>
+        </transition>
+
+    </div>
+    <template id="login">
+        <h2>{{Info}}</h2>
+    </template>
+    <template id="register">
+        <h2>{{Info}}</h2>
+    </template>
+    <script>
+        var vu = new Vue({
+            el: '#app',
+            data: {
+                //flage: true
+                componentName: "login-info"
+
+            },
+            methods: {},
+            components: {
+
+                loginInfo: {
+
+                    template: "#login",
+
+                    data: function () {
+                        return { Info: "登录功能" }
+                    }
+                },
+
+                registerInfo: {
+
+                    template: '#register',
+
+                    data: function () {
+                        return { Info: "注册功能" }
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

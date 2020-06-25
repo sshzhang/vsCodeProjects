@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <style>
+        [v-clock]{
+            display: none;
+        }
+    </style>
+</head>
+<!-- 
+
+v-clock 避免插值闪烁
+
+v-text 直接读取变量中的值
+
+v-bind 属性数据绑定, 简写可以用:
+
+v-on 事件绑定,简写可以用@
+
+-->
+<body>
+    <div id="name">
+        <input type="button" value="浪起来" v-on:click='lang'/>
+        <input type="button" value="低调" @click='stop'/>
+        <!-- <h4 v-text="msg"></h4> -->
+        <!-- <h4>{{msg}}</h4> -->
+    </div>
+    <script>
+    var vm=new Vue({
+        el:'#name',
+        data:{
+            msg:'猥琐发育,别浪！！！',
+            intervalId:null
+        },
+        methods:{
+            lang:function(){
+                // 定时操作
+                if(this.intervalId!=null) return;
+                this.intervalId=setInterval(() => {
+                var start=this.msg.substring(0,1);
+                var end=this.msg.substring(1);
+                // 修改数据之后，会自动把数据重新渲染到页面
+                this.msg=end+start;
+                console.log(this.msg);
+                }, 100)
+            },
+            
+            stop:function(){
+              // 清除定时器
+              clearInterval(this.intervalId); 
+              this.intervalId=null; 
+            }
+        }
+
+    })
+    </script>
+</body>
+</html>

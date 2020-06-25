@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+
+<style>
+
+.red{
+    color: brown;
+}
+.think{
+    font-size: 10px;
+}
+
+.itelic{
+    font-style: italic;
+}
+
+</style>
+
+
+</head>
+<body>
+
+    <!--v--bind在class中的应用-->
+    <div class="divFirst">
+     <h1 :class="classArray">我是最大的标题，你们都没有我打，我时最好的，我能行，我一定行!!</h1>
+    </div>
+
+
+    <script>
+
+        var vm=new Vue({
+            el:'.divFirst',
+            data:{
+
+                //classArray:[{red:true}, {think:false}, {itelic:true}]  false表示不应用
+                // classArray:["red", "think", "itelic"]
+                // classArray:['red', 'think',{itelic:true}]
+            },
+            methods:{}
+        });
+    </script>
+</body>
+</html>

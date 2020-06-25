@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+</head>
+<body>
+    <div id="sVue">
+        <!--v-if 直接移除这个元素  对于频繁操作元素比较费时-->
+        <p v-if="flage">测试v-if是否显示</p>
+        <!--v-show设置display:none来隐藏元素 因此初始渲染费时-->
+        <p v-show="flage">测试v-show是否显示</p>
+       <input type="button" value="改变状态" @click="change"/> 
+    </div>
+    <script>
+        var vue=new Vue({
+            el:'#sVue',
+            data:{
+                 flage:false
+            },
+            methods:{
+                change(){
+                   this.flage=!this.flage;
+                }
+            }
+        })
+    </script>
+</body>
+</html>

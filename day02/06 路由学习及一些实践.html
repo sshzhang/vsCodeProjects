@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+    <script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+
+    <style>
+
+        .router-name-enter,.router-name-leave-to{
+            opacity: 0;
+            transform: translateX(120px);
+        }
+
+        .router-name-enter-active,.router-name-leave-active{
+            transition: all 2s ease;
+        }
+    </style>
+</head>
+<!-- 配置路由三步
+
+1. new 一个路由实例对象， 并设置相应的路由配置信息 routes:[{path:'路径信息', component:'组件模板对象名称'}]
+
+2. 设置路由实例对象到vue实例中， router:路由实例对象
+
+3. 设置页面引用的路由视图信息   <router-view></router-view>
+-->
+
+<body>
+    <div id="app">
+        <!-- <a href="#/login">登录</a>
+        <a href="#/register">注册</a> -->
+        <router-link to="/login?id=123&name=zhang" tag="span">登录</router-link>
+        <router-link to="/register/2/zhang2" tag="span">注册</router-link>
+        <!--  3. router-view可以看作占位符 -->
+        <transition name="router-name" mode="out-in">
+            <router-view></router-view>
+        </transition>
+    </div>
+
+
+    <!-- 通过url传参的两种方式
+    
+    a. 第一种直接在url后面设置参数key=value对  利用this.$router.query获取相应数据
+
+    b. 在路由配置规则中设置{ path: '/register/:id/:name', component: registerObject }, 
+        传参数的时候只要/register/2/zhang2就能访问.利用this.$router.params获取相应数据
+    -->
+
+    <template id="login">
+        <h2>登陆页面+{{this.$route.query.id}}+{{this.$route.query.name}}</h2>
+    </template>
+    <template id="register">
+        <h2>注册页面+{{this.$route.params.id}}+{{this.$route.params.name}}</h2>
+    </template>
+
+    <script>
+        // 组件模板对象
+        var loginObject = {
+            template: '#login',
+            data() {
+                return {}
+            },
+            methods: {}
+        }
+
+        var registerObject = {
+            template: '#register',
+            data() {
+                return {}
+            },
+            methods: {}
+        }
+
+        // 1.  定义路由匹配规则信息
+        var vrouter = new VueRouter({
+            // 路由规则信息  路径及相应的url配置
+            routes: [
+                // 设置默认页面显示的数据 当path为/时会重定向到/login 
+                { path: '/', redirect: '/login' },
+                // 注意component 设置对应组件的模板对象而不是组件名
+                { path: '/login', component: loginObject },
+                // 传递参数的参数名
+                { path: '/register/:id/:name', component: registerObject }
+            ]
+        })
+
+        var vm = new Vue({
+            el: '#app',
+            data: {},
+            methods: {},
+            //2.  把路由信息装配到Vue实例中
+            router: vrouter
+
+        });
+
+
+
+    </script>
+</body>
+
+</html>

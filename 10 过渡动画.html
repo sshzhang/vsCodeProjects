@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
+    <style>
+        /*.v-enter-active,
+        .v-leave-active {
+            transition: opacity .8s;
+        }
+
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enter-active {
+            transition: all .8s ease;
+        }
+
+        .fade-leave-active {
+            transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+        }
+
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+            transform: translateX(100px);
+        }
+
+        .listElement-enter-active {
+
+            animation: bounceOutUp .5s;
+        }
+
+        .listElement-leave-active {
+            animation: bounceOutDown .8s;
+        }
+
+        .animate__animated.animate__bounce {
+            --animate-duration: 2s;
+        }*/
+
+        .radiusStyle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: hotpink;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+
+        <input @click="show=!show" value="快到碗里来" type="button" />
+        <transition name="bounce" @before-enter="beforeEnter" @enter="enter" @after-enter="enterCancelled">
+            <div class="radiusStyle" v-if="show"></div>
+        </transition>
+
+    </div>
+    <script>
+        var vue = new Vue({
+            el: '#app',
+            data: {
+                show: false
+            },
+            methods: {
+                // 动画还没开始时元素状态信息，可以设置元素开始动画前的位置及状态信息, el表示原生态dom
+                beforeEnter(el) {
+                    el.style.transform = 'translate(0,0)';
+                   
+                },
+                // 调用函数时动画已经开始，可以设置元素最后结束的位置信息及动画过程信息
+                enter(el, done) {
+                    // 强制刷新动画
+                  el.offsetWidth;
+                 el.style.transform='translate(120px, 300px)'
+                 el.style.transition='all 1s ease'
+                 // 调用enterCancelled方法
+                 done()
+                },
+
+                enterCancelled(el) {
+                     this.show=!this.show;
+                }
+            }
+        })
+
+    </script>
+
+</body>
+
+</html>

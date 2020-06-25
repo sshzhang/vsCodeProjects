@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+
+    <style>
+
+   .outter{
+    padding: 20px;
+    background-color: lightcyan;
+ }
+
+  .inner{
+      background-color: burlywood;
+  }
+    </style>
+</head>
+<body>
+    
+<!--vue中事件修饰符
+
+.stop 阻止事件冒泡
+.prevent 阻止默认行为 比如a标签中的跳转
+.capture 事件变为捕获模式， 本质上事件冒泡触发顺序相反， 由外到内
+.onece  表示事件只触发一次
+.self 表示此出不处理，但是不会影响事件的传播
+-->
+
+
+<div id="vdiv" class="outter" @click='div1Handler'>
+
+<!--事件默认是按照冒泡规则来处理的，也就是说由内到外， 添加.stop后事件就不会往外冒泡传播-->
+<!--<div class="inner" @click='div2Handler'>
+<input type="button" v-bind:value="msg" @click.stop='btnHandler'/>
+</div>-->
+
+<!--.self表示此处不会处理事件， 和.stop不同点在于， .self不会影响事件往外传播-->
+<!--<div class="inner" @click.self='div2Handler'>
+    <input type="button" v-bind:value="msg" @click='btnHandler'/>
+    </div>-->
+  
+    <!--.capture事件按照捕获规则来处理， 由外向内(只适用于一级子元素)-->
+    <!--<div class="inner" @click.capture='div2Handler'>
+        <input type="button" v-bind:value="msg" @click='btnHandler'/>
+        </div>-->
+
+       <!--.prevent 阻止默认(跳转)行为-->
+       <!-- <a href="https:www.baidu.com" v-on:click.prevent="aHandler">去百度</a>-->
+       <!--只调用一次， 下面只会阻止一次默认行为--> 
+       <a href="https:www.baidu.com" v-on:click.prevent.once="aHandler">去百度</a>
+</div>
+
+
+
+<script>
+
+var vm=new Vue({
+el:"#vdiv",
+data:{
+
+    msg:'出发点击事件'
+},
+methods:{
+
+    div1Handler(){
+    console.log('outterdiv')
+    },
+
+    div2Handler(){
+    console.log('innerdiv')
+    },
+    btnHandler(){
+    console.log('btnHandler')
+    },
+    aHandler(){
+        console.log('阻止跳转到百度')
+    }
+
+}
+
+})
+
+</script>
+
+
+</body>
+</html>

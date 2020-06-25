@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.1"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.0.0/animate.min.css" />
+
+    <style>
+        tr[class="bgcolor"]:hover {
+            background-color: hotpink;
+            transition: background-color .8s ease;
+        }
+
+
+        .listElement-enter,
+        .listElement-leave-to {
+            opacity: 0;
+            transform: translateY(180px);
+        }
+        .listElement-enter-active,
+        .listElement-leave-active {
+            transition: all 0.6s ease;
+        }
+
+
+
+
+
+        /*.list-element-enter-active, .list-element-leave-active{
+
+          transition: opacity .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+      }*/
+
+        /*.list-element-enter, .list-element-leave-to{
+          opacity: 0;
+          transform: translateY(180px);
+      }
+
+      list-move{
+          transition: transform 1s;
+      }*/
+    </style>
+
+</head>
+
+<body>
+
+    <!-- 
+   1. 写一个查询添加品牌模块
+       1.1 数组的一些方法复习， 字符串的一些新特性
+       1.2 全局和局部过滤器, 规范时间和查询
+       1.3 自定义F2按键事件  添加一个事件实现按F2或者enter实现添加新数据
+       1.3 自定义指令v-focus, v-color 实现, 局部和全局指令定义
+ -->
+
+    <div id="sDiv">
+
+        <div class="form-inline">
+            <label>name</label>
+            <!-- 
+                @keyup.enter="addMethod" 按enter键实现添加事件
+                  // 自定义按键修饰符别名
+                         Vue.config.keyCodes.F2 = 113; 或者直接通过按键码来设置事件监听 @keyup.113="addMethod"
+            -->
+            <input type="text" v-model="name" @keyup.F2="addMethod" />
+            <input type="button" class="btn btn-create" value="添加" @click="addMethod" />
+            <label>依据名称自动搜索:</label>
+
+            <!--v-color="'#f0f'" 需要使用''表示是字符串而不是变量-->
+            <input type="text" v-model="searchKeyWords" id="searchId" v-focus v-color="'#f0f'" @input="searchMethod" />
+        </div>
+
+        <table class="table">
+            <tr>
+                <th class="th-">编号</th>
+                <th>名称</th>
+                <th>时间</th>
+                <th>操作</th>
+            </tr>
+            <transition-group name="listElement" appear>
+                <tr v-for="item in lists" :key="item.id" class="bgcolor">
+                    <td>{{ item.id }}</td>
+                    <td>{{ item.name }}</td>
+                    <td>{{ item.timestamp|filterTime() }}</td>
+                    <td @click="delMethod(item.id)"><label><a>删除</a></label></td>
+                </tr>
+            </transition-group>
+        </table>
+
+    </div>
+    <script>
+
+        // 定义全局过滤器, 过滤器名, 对应实现过滤器韩式操作. 下面过滤器过滤规则化时间   
+        Vue.filter("filterTime", function (originalStr, arg = 'yyyy--mm--dd hh:mm:ss') {
+
+            //console.log('全局过滤器: '+typeof originalStr)
+            var date = new Date(originalStr);
+            var subTimeStr = arg.toLowerCase();
+            var year = date.getFullYear();
+            var month = (date.getMonth() + 1).toString().padStart(2, '0');
+            var day = date.getDate().toString().padStart(2, '0');
+            if (arg == 'yyyy--mm--dd hh:mm:ss') {
+                var hh = date.getHours().toString().padStart(2, '0');
+                var mm = date.getMinutes().toString().padStart(2, '0');
+                var ss = date.getSeconds().toString().padStart(2, '0');
+                return `${year}-${month}-${day}` + "   " + `${hh}-${mm}-${ss}`;
+            }
+            return `${year}-${month}-${day}`;
+        });
+
+        // 全局自定义指令v-focus格式为 指令名:对象， 其中指令名v-前缀不用写，默认就会携带。  对象中常用的三个函数如下
+        Vue.directive("focus", {
+
+            // 只调用一次， 指令第一次绑定到元素时，此时元素还未被渲染到dom 中，因此无法响应相应的动作事件，但是可以设置相应的样式
+            bind: function (el) {
+
+            },
+            // 被绑定元素插入到父元素时调用，能够相应行为事件
+            inserted: function (el) { // el表示的就是指令绑定的相应元素
+                el.focus();
+            },
+            // 更新调用？？？具体不是很清楚
+            update: function (el) {
+
+            }
+        })
+
+
+        // 全局自定义指令v-color格式为 指令名:对象， 其中指令名v-前缀不用写，默认就会携带。  对象中常用的三个函数如下
+        Vue.directive("color", {
+
+            // 只调用一次， 指令第一次绑定到元素时，此时元素还未被渲染到dom 中，因此无法响应相应的动作事件，但是可以设置相应的样式
+            /* bidding时一个对象   
+             * 包含 name 指令名属性
+               value 指令值
+               oldValue 之前的值
+               expression 指令表达式.......等等   https://cn.vuejs.org/v2/guide/custom-directive.html
+                
+            */
+            bind: function (el, binding) {
+                var value = binding.value;
+                el.style.color = value;
+            },
+            // 被绑定元素插入到父元素时调用，能够相应行为事件
+            inserted: function (el) { // el表示的就是指令绑定的相应元素
+            },
+            // 更新调用？？？具体不是很清楚
+            update: function (el) {
+
+            }
+        })
+
+
+
+        Vue.http.options.root = 'http://localhost:8080/serverVue/product/'
+
+        // 自定义按键修饰符别名
+        Vue.config.keyCodes.F2 = 113;
+        var vue = new Vue({
+            el: '#sDiv',
+            data: {
+
+                //id: '', // 添加数据的编号
+                name: '', // 添加的数据名称
+                searchKeyWords: '', // 查找关键字
+                lists: ''
+            },
+            methods: {
+
+                addMethod() {
+
+                    this.$http.jsonp("addProduct", { params: { name: this.name }, emulateJSON: true }).then(response => {
+
+                        var responseData = response.body;
+
+                        if (responseData.status === 0) {
+                            this.searchMethod();
+                            console.log(responseData.message);
+                        } else {
+                            alert("添加失败:" + responseData.message);
+                        }
+                    }, error => alert("添加异常!"))
+                    this.name = ''; // 完成后设置为'''
+                },
+
+                delMethod(pId) {
+                    this.$http.jsonp('deleteProduct', { params: { id: pId }, emulateJSON: true }).then(response => {
+                        var datas = response.body;
+                        if (datas.status == 0) {//删除成功重新请求数据
+                            this.searchMethod();
+                            console.log(datas.message)
+                        } else {
+                            alert(datas.message);
+                        }
+                    })
+                },
+
+                searchMethod() {
+
+                    this.$http.jsonp('searchProduct', { params: { name: this.searchKeyWords }, jsonp: 'callback' }).then(response => {
+
+
+                        var content = response.body;
+                        console.log('content.status: ' + content.status + " typeof content " + typeof content)
+                        console.log(content)
+                        if (content.status === 0) {
+                            this.lists = content.products;
+                        } else {
+                            alert(content.message)
+                            this.lists = [];
+                        }
+                    }, error => alert("查询异常!"))
+
+                    // return this.lists;
+                }
+
+            },
+
+
+            /*filters: { // 局部过滤器 定义格式为  过滤器名称:函数操作
+
+                filterTime: function (originalStr, arg = 'yyyy--mm--dd hh:mm:ss') {
+                    console.log('局部过滤器: '+typeof originalStr);
+                    var date = new Date(originalStr);
+                    var subTimeStr = arg.toLowerCase();
+                    var year = date.getFullYear();
+                    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    var day = date.getDate().toString().padStart(2, '0');
+                    if (arg == 'yyyy--mm--dd hh:mm:ss') {
+                        var hh = date.getHours().toString().padStart(2, '0');
+                        var mm = date.getMinutes().toString().padStart(2, '0');
+                        var ss = date.getSeconds().toString().padStart(2, '0');
+                        return `${year}*${month}*${day}` + "   " + `${hh}*${mm}*${ss}`;
+                    }
+                    return `${year}*${month}*${day}`;
+                }
+            },*/
+
+            // 局部自定义指令  默认指令调用顺序是先找局部指令，再找全局指令， 所谓的就近原则。
+            directives: {
+
+                color: {
+
+
+                    bind: function (el) {
+                        el.style.color = '#ff0';
+                    },
+                    // 被绑定元素插入到父元素时调用，能够相应行为事件
+                    inserted: function (el) { // el表示的就是指令绑定的相应元素
+                    },
+                    // 更新调用？？？具体不是很清楚
+                    update: function (el) {
+
+                    }
+                }
+
+            },
+            // 生命周期函数， 在vue实例创建完成之后调用，此时相应的区域还没有挂载到dom页面中
+
+
+            created: function () {
+                this.searchMethod();
+            }
+
+        })
+
+     // 如果我们想页面刷新的时候焦点直接在查询数据输入框中, 可以利用dom操作来实现, 但是vue就是避免我们直接操作dom元素的，从而我们可以利用dom中的自定义指令来实现dom操作
+     // document.getElementById('searchId').focus();
+
+
+    </script>
+</body>
+
+</html>

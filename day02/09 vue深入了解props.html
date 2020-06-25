@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+
+        <my-component v-bind='sInfo'></my-component>
+        <base-input v-model="username" :required="true" placeholder="Enter your username"></base-input>
+
+        <navigation-link url="/profile">
+            Your Profile
+          </navigation-link>
+        
+
+    </div>
+
+    <template id="temple1">
+        <div>
+            <div>
+                <label>id</label>
+                <span>{{id}}</span>
+            </div>
+
+            <div>
+                <label>message</label>
+                <span>{{message}}</span>
+            </div>
+            <div>
+                <label>snum</label>
+                <span>{{snum}}</span>
+            </div>
+        </div>
+    </template>
+
+    <template id="temple2">
+        <label>
+            {{ label }}
+            <!-- v-bind="$attrs" 以{required: true, placeholder: "Enter your username"}格式设置对应的属性名及属性值 -->
+            <!--v-on:input="$emit('input', $event.target.value)"调用父组件的方法设置数据双向绑定  -->
+            <input v-bind="$attrs" v-bind:value="value" v-on:input="$emit('input', $event.target.value)">
+        </label>
+    </template>
+    <script>
+
+        var componentObject = {
+            template: "#temple1",
+            props: {
+                id: Number,
+                message: [String, Object],
+                extra: {
+                    type: String,
+                    required: true
+                },
+                snum: {
+                    type: Number,
+                    default: 10
+                },
+                statusMsg: {
+                    validator: function (value) {
+                        return ['success', 'warning', 'danger'].indexOf(value) !== -1
+                    }
+                }
+            }
+        }
+
+        var input_component = {
+            inheritAttrs: false,
+            props: ['label', 'value'],
+            template: '#temple2'
+        }
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                sInfo: { id: 12, message: 'message info', extra: 'extra info', snum: 200, statusMsg: 'success' },
+                username: ''
+            },
+            methods: {},
+            components: {
+                "my-component": componentObject,
+                "base-input": input_component
+
+            }
+        });
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+</head>
+
+<body>
+
+    <!-- 主要讲两个知识点， 子组件如何访问父组件的数据，如何访问父组件的函数 -->
+
+
+
+    <!-- 子组件访问父组件数据的步骤
+       1.  在子组件标签引用中添加需要访问的父组件属性绑定  如下<template1 v-bind:ssh="msgParent"></template1>  绑定ssh属性并把父组件数据msgParent赋给此属性
+        
+        2. 在子组件中定义相应的属性数组来接收对应的数据， 比如下面组件模板对象templateObject中定义props:['ssh'],  记住 'ssh'必须和设置的属性名一样
+
+        3. 在模板中利用插值表达式相应的数据<h2>{{ssh}}</h2>
+    -->
+
+
+    <!--子组件访问父组件函数的方法
+     
+        1. 与子组件访问父组件属性不同，子组件访问父组件函数需要函数绑定v-on:若不是属性绑定v-bind:
+            如下在子组件标签引用的时候定义相应的属性名和属性值，比如v-on:func="showParentMsg" 表示定义事件名为func来指向父组件中函数showParentMsg
+        
+        2. 访问父类中函数调用 利用this.$emit来调用， 此函数可以调用函数的多个参数比如 this.$emit('func', '123','456'); 
+
+    
+    -->
+    <div id="app">
+        <template1 v-bind:ssh="msgParent" v-on:func="showParentMsg"></template1>
+    </div>
+
+    <template id="templ1">
+        <div>
+            <h2>{{ssh}}</h2>
+
+            <input type="button" value="访问父组件函数" @click="showInfo">
+        </div>
+    </template>
+
+    <script>
+        var templateObject = {
+            template: '#templ1',
+            props: ['ssh'],
+            data() {
+                return { msg: '子组件数据msg' }
+            },
+            methods: {
+
+                showInfo(){
+                    // 利用$emit函数调用父组件中的方法, func对应我们在标签引用的时候设置的函数属性名称, 会调用我们传入的属性值
+                    // 第二个参数设置调用的属性值, 利用这个方法我们也可以把子组件的数据添加到父组件data中
+                    this.$emit('func', '123','456');
+                }
+
+            }
+        }
+
+
+        var vu = new Vue({
+            el: '#app',
+            data: {
+                msgParent: "父组件数据msg"
+            },
+            methods: {
+                showParentMsg(data1,data2) {
+                    console.log(this.msgParent+data1+data2);
+                }
+            },
+            components: {
+                template1: templateObject
+            }
+        })
+    </script>
+</body>
+
+</html>

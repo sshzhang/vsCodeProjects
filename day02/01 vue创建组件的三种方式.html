@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../lib/vue.js"></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 那么标签名把大些部分换成-连接并且把大写变为小写。compHnumber变为comphnumber -->
+        <!-- <comp-hnumber></comphnumber> -->
+
+        <prshow1></prshow1>
+    </div>
+
+    <!-- 注意无论何种创建组件方式， 组件模板对象只能包含一个根节点元素，所以需要用div包含h6合span -->
+    <template id="temp3">
+        <div>
+            <h6>我是标题h6表示第三种创建方式</h6>
+            <span>spanspap</span>
+        </div>
+    </template>
+
+    <!-- 创建组件模板 -->
+    <template id="pr1">
+
+        <div>
+
+            <input type="button" @click="addOne" value="+1" />
+            <!-- 像插值表达式一样取值 -->
+            <span>{{count}}</span>
+        </div>
+
+    </template>
+
+    <script>
+        // 注意组件引用的时候需要想标签一样引用， 标签名就是组件名.   如果组件名有大写，那么标签名把大些部分换成-连接并且把大写变为小写。
+        // 第一种创建组件的方法 第一步先创建组件模板对象， 第二部创建命名为comp1的组件
+        var comTemplatedObjetc = Vue.extend({ template: '<h1> 我是标题h1表示第一种创建方式</h1>' })
+        Vue.component('compHnumber', comTemplatedObjetc);
+        // 第二种创建组件的方法，直接把上述两步合为一步
+        Vue.component('comH3', { template: '<h3>我是标题h3表示第二种创建方</h3>' })
+        // 第三种创建组件方法， 利用template标签来设置组件模板对象， 记住template标签一定要设置到vue实例控制区域外面
+        Vue.component('comtemplate', { template: '#temp3' })
+        var vu = new Vue({
+            el: "#app",
+            data: {},
+            methods: {},
+            // 创建局部组件   组件可以有自己的数据和方法， 前端主要按照ui划分为不同的组件，目的使组件复用； 而后端按照逻辑模块化保持职能单一，某种程度也能实现复用。
+            components: {
+                prshow1: {
+                  // 利用id选择器选择相应的组件模板
+                    template: '#pr1',
+                    //   组件可以有data数据，不过data只能指向函数，并且此函数只能返回对象类型数据
+                    data: function () {
+                        return { count: 0 };
+                    },
+
+                    methods: {
+                        addOne() {
+                            this.count++;
+                        }
+                    }
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

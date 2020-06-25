@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="./lib/vue.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+
+    <!-- 
+   1. 写一个查询添加品牌模块
+       1.1 数组的一些方法复习， 字符串的一些新特性
+       1.2 全局和局部过滤器, 规范时间和查询
+       1.3 自定义F2按键事件  添加一个事件实现按F2或者enter实现添加新数据
+       1.3 自定义指令v-focus, v-color 实现, 局部和全局指令定义
+ -->
+
+    <div id="sDiv">
+
+        <div class="form-inline">
+            <label style="padding-left: 20px;">id</label>
+            <input type="text" v-model="id" />
+            <label>name</label>
+            <!-- 
+                @keyup.enter="addMethod" 按enter键实现添加事件
+                  // 自定义按键修饰符别名
+                         Vue.config.keyCodes.F2 = 113; 或者直接通过按键码来设置事件监听 @keyup.113="addMethod"
+            -->
+            <input type="text" v-model="name" @keyup.F2="addMethod" />
+            <input type="button" class="btn btn-create" value="添加" @click="addMethod" />
+            <label>依据名称自动搜索:</label>
+
+            <!--v-color="'#f0f'" 需要使用''表示是字符串而不是变量-->
+            <input type="text" v-model="searchKeyWords" id="searchId" v-focus v-color="'#f0f'" />
+        </div>
+
+        <table class="table table-hover">
+            <tr>
+                <th class="th-">编号</th>
+                <th>名称</th>
+                <th>时间</th>
+                <th>操作</th>
+            </tr>
+
+            <tr v-for="item in searchMethod(searchKeyWords)" :key="item.id">
+                <td>{{ item.id }}</td>
+                <td>{{ item.name }}</td>
+                <td>{{ item.cTime|filterTime() }}</td>
+                <td @click="delMethod(item.id)"><label><a>删除</a></label></td>
+            </tr>
+        </table>
+
+    </div>
+    <script>
+
+        // 定义全局过滤器, 过滤器名, 对应实现过滤器操作. 下面过滤器过滤规则化时间   
+        Vue.filter("filterTime", function (originalStr, arg = 'yyyy--mm--dd hh:mm:ss') {
+            var date = new Date(originalStr);
+            var subTimeStr = arg.toLowerCase();
+            var year = date.getFullYear();
+            var month = (date.getMonth() + 1).toString().padStart(2, '0');
+            var day = date.getDate().toString().padStart(2, '0');
+            if (arg == 'yyyy--mm--dd hh:mm:ss') {
+                var hh = date.getHours().toString().padStart(2, '0');
+                var mm = date.getMinutes().toString().padStart(2, '0');
+                var ss = date.getSeconds().toString().padStart(2, '0');
+                return `${year}-${month}-${day}` + "   " + `${hh}-${mm}-${ss}`;
+            }
+            return `${year}-${month}-${day}`;
+        });
+
+        // 全局自定义指令v-focus格式为 指令名:对象， 其中指令名v-前缀不用写，默认就会携带。  对象中常用的三个函数如下
+        Vue.directive("focus", {
+
+            // 只调用一次， 指令第一次绑定到元素时，此时元素还未被渲染到dom 中，因此无法响应相应的动作事件，但是可以设置相应的样式
+            bind: function (el) {
+
+            },
+            // 被绑定元素插入到父元素时调用，能够相应行为事件
+            inserted: function (el) { // el表示的就是指令绑定的相应元素
+                el.focus();
+            },
+            // 更新调用？？？具体不是很清楚
+            update: function (el) {
+
+            }
+        })
+
+
+        // 全局自定义指令v-color格式为 指令名:对象， 其中指令名v-前缀不用写，默认就会携带。  对象中常用的三个函数如下
+        Vue.directive("color", {
+
+            // 只调用一次， 指令第一次绑定到元素时，此时元素还未被渲染到dom 中，因此无法响应相应的动作事件，但是可以设置相应的样式
+            /* bidding时一个对象   
+             * 包含 name 指令名属性
+               value 指令值
+               oldValue 之前的值
+               expression 指令表达式.......等等   https://cn.vuejs.org/v2/guide/custom-directive.html
+                
+            */
+            bind: function (el, binding) {
+                var value = binding.value;
+                el.style.color = value;
+            },
+            // 被绑定元素插入到父元素时调用，能够相应行为事件
+            inserted: function (el) { // el表示的就是指令绑定的相应元素
+            },
+            // 更新调用？？？具体不是很清楚
+            update: function (el) {
+
+            }
+        })
+
+
+
+
+
+        // 自定义按键修饰符别名
+        Vue.config.keyCodes.F2 = 113;
+        var vue = new Vue({
+            el: '#sDiv',
+            data: {
+
+                id: '', // 添加数据的编号
+                name: '', // 添加的数据名称
+                searchKeyWords: '', // 查找关键字
+                lists: [{ id: 1, name: '宝马', cTime: new Date() },
+                { id: 2, name: '奔驰', cTime: new Date() },
+                { id: 3, name: '奥迪', cTime: new Date() },
+                { id: 4, name: '兰博基尼', cTime: new Date() }]
+            },
+            methods: {
+
+                addMethod() {
+                    this.lists.push({ id: this.id, name: this.name, cTime: new Date() })
+                },
+                delMethod(id) {
+
+                    // 1.  some方法在数组中找出一个满足条件的元素， 
+                    /*this.lists.some((item, index)=>{
+                        if(item.id===id){
+                            this.lists.splice(index,1);
+                            return true;
+                        }
+                    })*/
+
+
+                    // 2.  遍历所有元素 返回条件为true的所有元素
+                    //this.lists=this.lists.filter(item=>item.id!=id) // 只留下返回true对应的元素
+
+
+                    // 3.  find方法找出满足条件的第一个元素并返回, 注意此处()=>表达式没有this对象，它引用的时外部的this对象 
+                    /*this.lists.find((value,index,arr)=>{
+                        if(value.id==id){
+                            this.lists.splice(index,1);
+                            return true;
+                        }
+                    })*/
+
+
+                    // 4.  返回第一个满足条件的元素所在的索引, 
+                    // splice函数第一个参数是插入元素的位置， 第二个元素是删除元素的个数， 后面表示对应的插入元素
+                    var delId = this.lists.findIndex(function (value, index, arr) {
+                        return value.id == id;
+                    })
+                    this.lists.splice(delId, 1);
+
+
+                },
+                searchMethod(searchKeyWords) {
+                    /*  this.searchKeyWord 查找满足条件的记录, 注意this.searchKeyWord初始值为''时，
+                     *  查询结果满足条件    '123'.includes('') 和'123'.indexOf('') 都为true
+                    */
+                    return this.lists.filter(item => item.name.includes(searchKeyWords));
+                }
+            },
+
+
+            filters: { // 局部过滤器 定义格式为  过滤器名称:函数操作
+
+                filterTime: function (originalStr, arg = 'yyyy--mm--dd hh:mm:ss') {
+                    console.log('typeof originalStr: '+typeof originalStr)
+                    var date = new Date(originalStr);
+                    var subTimeStr = arg.toLowerCase();
+                    var year = date.getFullYear();
+                    var month = (date.getMonth() + 1).toString().padStart(2, '0');
+                    var day = date.getDate().toString().padStart(2, '0');
+                    if (arg == 'yyyy--mm--dd hh:mm:ss') {
+                        var hh = date.getHours().toString().padStart(2, '0');
+                        var mm = date.getMinutes().toString().padStart(2, '0');
+                        var ss = date.getSeconds().toString().padStart(2, '0');
+                        return `${year}*${month}*${day}` + "   " + `${hh}*${mm}*${ss}`;
+                    }
+                    return `${year}*${month}*${day}`;
+                }
+            },
+
+            // 局部自定义指令  默认指令调用顺序是先找局部指令，再找全局指令， 所谓的就近原则。
+            directives: {
+
+                color: {
+
+
+                    bind: function (el) {
+                        el.style.color = '#ff0';
+                    },
+                    // 被绑定元素插入到父元素时调用，能够相应行为事件
+                    inserted: function (el) { // el表示的就是指令绑定的相应元素
+                    },
+                    // 更新调用？？？具体不是很清楚
+                    update: function (el) {
+
+                    }
+                }
+
+            }
+
+
+
+        })
+
+     // 如果我们想页面刷新的时候焦点直接在查询数据输入框中, 可以利用dom操作来实现, 但是vue就是避免我们直接操作dom元素的，从而我们可以利用dom中的自定义指令来实现dom操作
+     // document.getElementById('searchId').focus();
+
+
+    </script>
+</body>
+
+</html>
